@@ -26,3 +26,25 @@
 - Создать docker-compose.yml для сборки приложения
 - Подготовить инфру для поднятия кубера и развертывания приложения в нем
 - Развернуть инфру и GitLab в ней для CI/CD 
+
+## Выполнено:
+
+1. Создан makefile для сборки образов
+~~~bash
+cd ./docker
+make
+~~~
+
+2. Создан docker-compose.yml для сборки приложения
+~~~bash
+➜  docker git:(main) docker-compose up -d
+➜  docker git:(main) curl http://localhost:8000
+<!doctype html>
+<html>
+    <head>
+        <title>Best search engine ever</title>
+        <style type="text/css">
+        body, html {
+
+  ...
+  ~~~
