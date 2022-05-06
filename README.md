@@ -54,4 +54,6 @@ make
 cd ../terraform-k8s 
 terraform init
 terraform apply --auto-approve
+yc managed-kubernetes cluster get-credentials k8s-dev --external --force
+kubectl apply -f ../k8s/crawler/namespaces.yml
 ~~~

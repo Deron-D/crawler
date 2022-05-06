@@ -1,0 +1,27 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata: # Блок метаданных деплоя
+  name: ui
+  labels:
+    app: search_engine
+    component: ui
+spec: # Блок спецификации деплоя
+  replicas: 3
+  selector:
+    matchLabels:
+      app: search_engine
+      component: ui
+  template: # Блок описания POD-ов
+    metadata:
+      name: ui-pod
+      labels:
+        app: search_engine
+        component: ui
+    spec:
+      containers:
+      - image: deron73/crawler-ui:1.0
+        name: ui
+        env:
+        - name: MONGO
+          value: mongodb

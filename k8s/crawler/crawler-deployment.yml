@@ -1,0 +1,37 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: crawler
+  labels:
+    app: search_engine
+    component: crawler
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: search_engine
+      component: crawler
+  template:
+    metadata:
+      name: crawler
+      labels:
+        app: search_engine
+        component: crawler
+    spec:
+      containers:
+      - image: deron73/crawler-engine:1.0
+        name: crawler
+        env:
+        - name: MONGO
+          value: mongodb
+        - name: RMQ_HOST
+          value: rabbitmq
+        - name: RMQ_USERNAME
+          value: rabbitmq
+        - name: RMQ_PASSWORD
+          value: rabbitmq
+        - name: CHECK_INTERVAL
+          value: "5"
+        - name: EXCLUDE_URLS
+          value: '.*github.com'

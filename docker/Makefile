@@ -12,3 +12,11 @@ build-crawler-engine::
 build-crawler-ui::
 	cd ../source/search_engine_ui/ && \
 	docker build --no-cache -t $(USER_NAME)/crawler-ui:$(CRAWLER_UI_VERSION) .
+
+# DOCKER PUSH
+push:: push-crawler-engine push-crawler-ui
+
+push-crawler-engine::
+	docker push $(USER_NAME)/crawler-engine:$(CRAWLER_ENGINE_VERSION)
+push-crawler-ui::
+	docker push $(USER_NAME)/crawler-ui:$(CRAWLER_UI_VERSION)

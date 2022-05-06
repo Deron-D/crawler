@@ -1,0 +1,24 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mongo
+  labels:
+    app: search_engine
+    component: mongo
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: search_engine
+      component: mongo
+  template:
+    metadata:
+      name: mongo
+      labels:
+        app: search_engine
+        component: mongo
+    spec:
+      containers:
+      - image: mongo:3.2
+        name: mongo
