@@ -1,6 +1,0 @@
-[submodule "source/search_engine_crawler"]
-	path = source/search_engine_crawler
-	url = https://github.com/Deron-D/search_engine_crawler
-[submodule "source/search_engine_ui"]
-	path = source/search_engine_ui
-	url = https://github.com/Deron-D/search_engine_ui
