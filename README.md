@@ -48,3 +48,10 @@ make
 
   ...
   ~~~
+
+3. Деплой приложения в k8s
+~~~bash
+cd ../terraform-k8s 
+terraform init
+terraform apply --auto-approve
+~~~
