@@ -17,7 +17,7 @@ provider "yandex" {
 }
 
 resource "yandex_kubernetes_cluster" "k8s-cluster" {
-  name       = "k8s-dev"
+  name       = "k8s-4otus"
   network_id = var.network_id
 
   master {

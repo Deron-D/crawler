@@ -55,5 +55,7 @@ cd ../terraform-k8s
 terraform init
 terraform apply --auto-approve
 yc managed-kubernetes cluster get-credentials k8s-dev --external --force
+helm install ingress-nginx ingress-nginx/ingress-nginx
 kubectl apply -f ../k8s/crawler/namespaces.yml
+kubectl apply -f ../k8s/crawler/ -n dev  
 ~~~
