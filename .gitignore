@@ -14,3 +14,4 @@ inventory.ini
 *.rpm
 *.crt
 *.key
+*.env
