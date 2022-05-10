@@ -4,3 +4,6 @@
 [submodule "src/search_engine_ui"]
 	path = src/search_engine_ui
 	url = https://github.com/Deron-D/search_engine_ui.git
+[submodule "src/search_engine_crawler"]
+	path = src/search_engine_crawler
+	url = https://github.com/Deron-D/search_engine_crawler.git
