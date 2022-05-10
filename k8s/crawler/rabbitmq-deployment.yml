@@ -14,7 +14,7 @@ spec:
       component: rabbitmq
   template:
     metadata:
-      name: rabbitmq
+      name: rabbitmq-pod
       labels:
         app: search_engine
         component: rabbitmq

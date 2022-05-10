@@ -7,7 +7,9 @@ metadata: # Блок метаданных деплоя
     app: search_engine
     component: ui
 spec: # Блок спецификации деплоя
-  replicas: 3
+  replicas: 2
+  strategy:
+    type: Recreate
   selector:
     matchLabels:
       app: search_engine
@@ -15,6 +17,9 @@ spec: # Блок спецификации деплоя
   template: # Блок описания POD-ов
     metadata:
       name: ui-pod
+      annotations:
+        prometheus.io/port: "8000"
+        prometheus.io/scrape: "true"
       labels:
         app: search_engine
         component: ui
@@ -22,6 +27,13 @@ spec: # Блок спецификации деплоя
       containers:
       - image: deron73/crawler-ui:1.0
         name: ui
+        ports:
+          - containerPort: 8000
+            name: ui
+            protocol: TCP
         env:
         - name: MONGO
-          value: mongodb
+          value: mongo
+        - name: MONGO_PORT
+          value: "27017"
+          

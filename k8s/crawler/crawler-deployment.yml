@@ -7,14 +7,17 @@ metadata:
     app: search_engine
     component: crawler
 spec:
-  replicas: 3
+  replicas: 2
   selector:
     matchLabels:
       app: search_engine
       component: crawler
   template:
     metadata:
-      name: crawler
+      annotations:
+        prometheus.io/port: "8000"
+        prometheus.io/scrape: "true"
+      name: crawler-pod
       labels:
         app: search_engine
         component: crawler
@@ -24,14 +27,20 @@ spec:
         name: crawler
         env:
         - name: MONGO
-          value: mongodb
+          value: mongo
+        - name: MONGO_PORT
+          value: "27017"
         - name: RMQ_HOST
           value: rabbitmq
         - name: RMQ_USERNAME
           value: rabbitmq
         - name: RMQ_PASSWORD
           value: rabbitmq
+        - name: RMQ_QUEUE
+          value: "urls"
+        - name: URL
+          value: "https://vitkhab.github.io/search_engine_test_site/"
         - name: CHECK_INTERVAL
-          value: "5"
+          value: "30"
         - name: EXCLUDE_URLS
-          value: '.*github.com'
+          value: ".*github.com"
