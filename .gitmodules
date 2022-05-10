@@ -1,0 +1,6 @@
+[submodule "source/search_engine_crawler"]
+	path = source/search_engine_crawler
+	url = git@github.com:Deron-D/search_engine_crawler.git
+[submodule "source/search_engine_ui"]
+	path = source/search_engine_ui
+	url = git@github.com:Deron-D/search_engine_ui.git
