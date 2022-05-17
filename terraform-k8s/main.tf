@@ -17,7 +17,7 @@ provider "yandex" {
 }
 
 resource "yandex_kubernetes_cluster" "k8s-cluster" {
-  name       = "k8s-4otus"
+  name       = var.cluster_name
   network_id = var.network_id
 
   master {
@@ -64,4 +64,11 @@ resource "yandex_kubernetes_node_group" "k8s-node" {
       size = var.count_of_workers
     }
   }
+  provisioner "local-exec" {
+    command = "yc managed-kubernetes cluster get-credentials $CLUSTER_NAME --external --force"
+    environment = {
+      CLUSTER_NAME = var.cluster_name
+    }
+  }
+
 }

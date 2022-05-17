@@ -1,0 +1,5 @@
+---
+# vars file for roles/config-gitlab-ci
+
+
+remote_path: '/etc/gitlab/initial_root_password'

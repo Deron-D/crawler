@@ -16,9 +16,6 @@ variable public_key_path {
 # variable image_id {
 #   description = "Disk image"
 # }
-variable network_id {
-  description = "Network"
-}
 variable subnet_id {
   description = "Subnet"
 }
@@ -43,25 +40,12 @@ variable enable_provision {
 variable token {
   description = "<OAuth>"
 }
-variable service_account_id {
-  description = "<service_account_id>"
-}
-variable cores {
-  description = "VM cores"
-  default     = 4
+variable cpu {
+  description = "Number of CPUs"
 }
 variable memory {
-  description = "VM memory"
-  default     = 8
+  description = "Memory value"
 }
-variable disk {
-  description = "Disk size"
-  default     = 64
-}
-variable count_of_workers {
-  description = "count_of_workers"
-  default     = 2
-}
-variable cluster_name {
-  description = "k8s  cluster name"
+variable image_id {
+  description = "Image ID"
 }

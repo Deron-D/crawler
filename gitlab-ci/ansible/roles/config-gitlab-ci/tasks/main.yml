@@ -1,0 +1,17 @@
+---
+# tasks file for roles/config-gitlab-ci
+
+- name: Get content of /etc/gitlab/initial_root_password
+  slurp:
+    src: "{{remote_path}}"
+  register: remote_content_encoded
+
+- name: Decode remote content
+  set_fact:
+    remote_content: "{{remote_content_encoded.content | b64decode}}"
+
+- set_fact:
+    gitlab_ci_root_password: "{{ remote_content | regex_search('(?<=Password: )\\S+', multiline=True) }}"
+  
+- debug:
+    msg: "content of remote file {{remote_path}}: {{ gitlab_ci_root_password }}"

@@ -1,0 +1,7 @@
+- name: Deploy & Configure GitLab-CI runners
+  hosts: gitlab-ci-vm
+  become: true
+
+  roles:
+    - gitlab-runners-deploy
+    - gitlab-runners-configure

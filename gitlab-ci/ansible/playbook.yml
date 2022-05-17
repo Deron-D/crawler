@@ -1,0 +1,6 @@
+- name: Configure GitLab-CI
+  hosts: all
+  become: true
+
+  roles:
+    - config-gitlab-ci

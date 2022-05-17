@@ -6,7 +6,7 @@ public_key_path = "~/.ssh/appuser.pub"
 subnet_id = "exampleexampleexample"
 service_account_key_file = "key.json"
 private_key_path = "~/.ssh/appuser"
-count_of_workers = 2
-network_id               = "jhsfjkhdsjhdsjfh"
-service_account_id = "qazxsw"
-cluster_name             = "k8s-4otus"
+count_of_instances = 1
+cpu = 2
+memory = 4
+
