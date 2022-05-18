@@ -2,8 +2,8 @@ stages:
   - build
   - deploy
 
-# variables:
-#   USER_NAME='deron73'
+variables:
+  USER_NAME: 'deron73'
 
 build:
   stage: build
@@ -20,14 +20,15 @@ build:
     - docker push cr.yandex/crpgcgk4jpof2ibnqn7j/crawler-engine:gitlab-$CI_COMMIT_SHORT_SHA
 
 deploy:
-  image: gcr.io/cloud-builders/kubectl:latest
+  image: ruby:2.4.2
   stage: deploy
   script:
-    - pwd
-    - cd ./k8s/crawler/
-    - kubectl apply -f .
+    - curl -LO https://storage.googleapis.com/kubernetes-release/release/`curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt`/bin/linux/amd64/kubectl
+    - chmod +x ./kubectl
+    - mv ./kubectl /usr/local/bin/kubectl
     - kubectl config set-cluster k8s-4otus --server="$KUBE_URL" --insecure-skip-tls-verify=true
     - kubectl config set-credentials admin --token="$KUBE_TOKEN"
-    - kubectl config set-context default --cluster=k8s=4otus --user=admin
+    - kubectl config set-context default --cluster=k8s-4otus --user=admin
     - kubectl config use-context default
+    - ls -lr
   
