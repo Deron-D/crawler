@@ -15,9 +15,8 @@ build:
   services:
     - docker:19.03.1-dind
   script:
-    - ls -lr
-    - ll
     - cd ./src/search_engine_crawler
+    - ls -lr
     - docker build . -t cr.yandex/crpgcgk4jpof2ibnqn7j/crawler-engine:gitlab-$CI_COMMIT_SHORT_SHA
     - docker push cr.yandex/crpgcgk4jpof2ibnqn7j/crawler-engine:gitlab-$CI_COMMIT_SHORT_SHA
 
