@@ -8,7 +8,7 @@ nameOverride: ""
 
 ## Override the deployment namespace
 ##
-namespaceOverride: "dev"
+namespaceOverride: ""
 
 ## Provide a k8s version to auto dashboard import script example: kubeTargetVersionOverride: 1.16.6
 ##
@@ -161,24 +161,66 @@ alertmanager:
   ## ref: https://prometheus.io/docs/alerting/configuration/#configuration-file
   ##      https://prometheus.io/webtools/alerting/routing-tree-editor/
   ##
+  # config:
+  #   global:
+  #     resolve_timeout: 5m
+  #   route:
+  #     group_by: ['job']
+  #     group_wait: 30s
+  #     group_interval: 5m
+  #     repeat_interval: 12h
+  #     receiver: 'null'
+  #     routes:
+  #     - match:
+  #         alertname: Watchdog
+  #       receiver: 'null'
+  #   receivers:
+  #   - name: 'null'
+  #   templates:
+  #   - '/etc/alertmanager/config/*.tmpl'
   config:
     global:
       resolve_timeout: 5m
+      slack_api_url: 'https://hooks.slack.com/services/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'
     route:
-      group_by: ['job']
+      group_by: ['alertname', 'cluster', 'service']
       group_wait: 30s
       group_interval: 5m
-      repeat_interval: 12h
-      receiver: 'null'
+      repeat_interval: 1h
+      receiver: 'default-receiver'
       routes:
       - match:
-          alertname: Watchdog
+          alertname: DeadMansSwitch
         receiver: 'null'
+    inhibit_rules:
+    - source_match:
+        severity: 'critical'
+      target_match:
+        severity: 'warning'
+      equal: ['alertname', 'cluster', 'service']
     receivers:
+    - name: 'default-receiver'
+      slack_configs:
+      - channel: '#alerts' # Ваш канал Slack для оповещений
+        username: 'AlertManager'  # Имя, отображаемое в оповещении
+        color: '{{ if eq .Status "firing" }}danger{{ else }}good{{ end }}'
+        title: '[{{ .Status | toUpper }}{{ if eq .Status "firing" }}:{{ .Alerts.Firing | len }}{{ end }}] Prometheus Event Notification'
+        title_link: '{{ template "slack.default.titlelink" . }}'
+        pretext: '{{ .CommonAnnotations.summary }}'
+        text: |-
+          {{ range .Alerts }}
+            {{- if .Annotations.summary }}*Alert:* {{ .Annotations.summary }} - `{{ .Labels.severity }}`{{- end }}
+            *Description:* {{ .Annotations.description }}{{ .Annotations.message }}
+            *Graph:* <{{ .GeneratorURL }}|:chart_with_upwards_trend:>{{ if or .Annotations.runbook .Annotations.runbook_url }} *Runbook:* <{{ .Annotations.runbook }}{{ .Annotations.runbook_url }}|:spiral_note_pad:>{{ end }}
+            *Details:*
+            {{ range .Labels.SortedPairs }} • *{{ .Name }}:* `{{ .Value }}`
+            {{ end }}
+          {{ end }}
+        fallback: '{{ template "slack.default.fallback" . }}'
+        icon_emoji: '{{ template "slack.default.iconemoji" . }}'
+        icon_url: '{{ template "slack.default.iconurl" . }}'
+        send_resolved: true
     - name: 'null'
-    templates:
-    - '/etc/alertmanager/config/*.tmpl'
-
   ## Pass the Alertmanager configuration directives through Helm's templating
   ## engine. If the Alertmanager configuration contains Alertmanager templates,
   ## they'll need to be properly escaped so that they are not interpreted by
@@ -2516,6 +2558,15 @@ prometheus:
     #    {{end}}
     #    relabel_configs:
     #    ...
+    additionalScrapeConfigs: |
+      - job_name: 'crawler'
+        metrics_path: /metrics
+        static_configs:
+        - targets: ['crawler:8000']
+      - job_name: 'search_engine_ui'
+        metrics_path: /metrics
+        static_configs:
+        - targets: ['ui:8000']
 
 
     ## If additional scrape configurations are already deployed in a single secret file you can use this section.
