@@ -25,9 +25,9 @@ deploy:
   script:
     - pwd
     - cd ./k8s/crawler/
-    - kubectl apply -f namespaces.yml
-    - kubectl config set-cluster k8s --server="$KUBE_URL" --insecure-skip-tls-verify=true
+    - kubectl apply -f .
+    - kubectl config set-cluster k8s-4otus --server="$KUBE_URL" --insecure-skip-tls-verify=true
     - kubectl config set-credentials admin --token="$KUBE_TOKEN"
-    - kubectl config set-context default --cluster=k8s --user=admin
+    - kubectl config set-context default --cluster=k8s=4otus --user=admin
     - kubectl config use-context default
   
