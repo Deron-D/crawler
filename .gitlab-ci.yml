@@ -18,6 +18,9 @@ build:
     - cd ./src/search_engine_crawler
     - docker build . -t cr.yandex/crpgcgk4jpof2ibnqn7j/crawler-engine:gitlab-$CI_COMMIT_SHORT_SHA
     - docker push cr.yandex/crpgcgk4jpof2ibnqn7j/crawler-engine:gitlab-$CI_COMMIT_SHORT_SHA
+    - cd ../search_engine_ui
+    - docker build . -t cr.yandex/crpgcgk4jpof2ibnqn7j/crawler-ui:gitlab-$CI_COMMIT_SHORT_SHA
+    - docker push cr.yandex/crpgcgk4jpof2ibnqn7j/crawler-ui:gitlab-$CI_COMMIT_SHORT_SHA
 
 deploy:
   image: ruby:2.4.2
@@ -33,5 +36,7 @@ deploy:
     - ls -lr
     - cd ./k8s/crawler/
     - kubectl apply -f namespaces.yml
+    - sed -i "s/deron73\x2Fcrawler-engine:1.0/cr.yandex\x2Fcrpgcgk4jpof2ibnqn7j\x2Fcrawler-engine:gitlab-$CI_COMMIT_SHORT_SHA/" crawler-deployment.yml
+    - sed -i "s/deron73\x2Fcrawler-ui:1.0/cr.yandex\x2Fcrpgcgk4jpof2ibnqn7j\x2Fcrawler-ui:gitlab-$CI_COMMIT_SHORT_SHA/" ui-deployment.yml
     - kubectl apply -f . -n dev
   
