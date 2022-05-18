@@ -1,6 +1,6 @@
 imagePullPolicy: IfNotPresent
-gitlabUrl: http://51.250.7.243/
-runnerRegistrationToken: "GR1348941-pgPbGQmzTFybAuEyeXn"
+gitlabUrl: http://51.250.92.22/
+runnerRegistrationToken: "GR1348941U4daZfT7wyFu27izfMkg"
 terminationGracePeriodSeconds: 3600
 concurrent: 10
 checkInterval: 30
