@@ -1,5 +1,5 @@
 stages:
-  - build
+#  - build
   - deploy
 
 # variables:
@@ -16,7 +16,6 @@ build:
     - docker:19.03.1-dind
   script:
     - cd ./src/search_engine_crawler
-    - ls -lr
     - docker build . -t cr.yandex/crpgcgk4jpof2ibnqn7j/crawler-engine:gitlab-$CI_COMMIT_SHORT_SHA
     - docker push cr.yandex/crpgcgk4jpof2ibnqn7j/crawler-engine:gitlab-$CI_COMMIT_SHORT_SHA
 
@@ -24,10 +23,11 @@ deploy:
   image: gcr.io/cloud-builders/kubectl:latest
   stage: deploy
   script:
+    - pwd
+    - cd ./crawler/k8s/crawler/
+    - kubectl apply -f namespaces.yml
     - kubectl config set-cluster k8s --server="$KUBE_URL" --insecure-skip-tls-verify=true
     - kubectl config set-credentials admin --token="$KUBE_TOKEN"
     - kubectl config set-context default --cluster=k8s --user=admin
     - kubectl config use-context default
-    - sed -i "s/__VERSION__/gitlab-$CI_COMMIT_SHORT_SHA/" k8s.yaml
-    - cat k8s.yaml
-    #- kubectl apply -f k8s.yaml
+  

@@ -74,14 +74,12 @@ kubectl --namespace default get services -o wide -w ingress-nginx-controller
 #GitLab CI
 cd k8s/gitlab-ci
 kubectl apply -f gitlab-admin-service-account.yaml
-kubectl -n kube-system get secrets -o json | \
-jq -r '.items[] | select(.metadata.name | startswith("gitlab-admin")) | .data.token' | base64 --decode > token.txt
+kubectl -n kube-system get secrets -o json | jq -r '.items[] | select(.metadata.name | startswith("gitlab-admin")) | .data.token' | base64 --decode > token.txt
 
 helm install --namespace default gitlab-runner -f values.yaml gitlab/gitlab-runner
 kubectl get pods -n default | grep gitlab-runner
 
-yc managed-kubernetes cluster get k8s-otus --format=json \
-| jq -r .master.master_auth.cluster_ca_certificate
+yc managed-kubernetes cluster get k8s-otus --format=json | jq -r .master.master_auth.cluster_ca_certificate
 -----BEGIN CERTIFICATE-----
 MIIC5zCCAc+gAwIBAgIBADANBgkqhkiG9w0BAQsFADAVMRMwEQYDVQQDEwprdWJl
 cm5ldGVzMB4XDTIyMDUxODA3MzM1NFoXDTMyMDUxNTA3MzM1NFowFTETMBEGA1UE
