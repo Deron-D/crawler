@@ -70,34 +70,38 @@ helm install \
 kubectl apply -f ../k8s/crawler/namespaces.yml
 kubectl apply -f ../k8s/crawler/ -n dev
 kubectl --namespace default get services -o wide -w ingress-nginx-controller
-cd ..  
-helm repo add gitlab https://charts.gitlab.io/
-helm repo update
-
-helm upgrade --install gitlab gitlab/gitlab --set certmanager-issuer.email=dmitriypnev@gmail.com
-helm uninstall gitlab 
-
-yc vpc address create --external-ipv4 zone=ru-central1-a
-
-
-helm upgrade --install gitlab gitlab/gitlab \
-  --timeout 600s \
-  --set global.hosts.domain=51.250.86.100.nip.io \
-  --set global.hosts.externalIP=51.250.86.100 \
-  --set certmanager-issuer.email=dmitriypnev@gmail.com \
-  --set certmanager.rbac.create=false \
-  --set nginx-ingress.rbac.createRole=false \
-  --set prometheus.rbac.create=false \
-  --set gitlab-runner.rbac.create=false \
-  --set postgresql.image.tag=13.6.0
 
 #GitLab CI
-cd k8s/gitlab-ci 
+cd k8s/gitlab-ci
 kubectl apply -f gitlab-admin-service-account.yaml
 kubectl -n kube-system get secrets -o json | \
-jq -r '.items[] | select(.metadata.name | startswith("gitlab-admin")) | .data.token' | \
-base64 --decode
-eyJhbGciOiJSUzI1NiIsImtpZCI6InFTaGZnVDVRdzQ0bHZHS0Rnd1BNUXpHdGYwczVwOVlGcnNEdUVtcThMVTAifQ.eyJpc3MiOiJrdWJlcm5ldGVzL3NlcnZpY2VhY2NvdW50Iiwia3ViZXJuZXRlcy5pby9zZXJ2aWNlYWNjb3VudC9uYW1lc3BhY2UiOiJrdWJlLXN5c3RlbSIsImt1YmVybmV0ZXMuaW8vc2VydmljZWFjY291bnQvc2VjcmV0Lm5hbWUiOiJnaXRsYWItYWRtaW4tdG9rZW4tMm1jNTUiLCJrdWJlcm5ldGVzLmlvL3NlcnZpY2VhY2NvdW50L3NlcnZpY2UtYWNjb3VudC5uYW1lIjoiZ2l0bGFiLWFkbWluIiwia3ViZXJuZXRlcy5pby9zZXJ2aWNlYWNjb3VudC9zZXJ2aWNlLWFjY291bnQudWlkIjoiNTM0NWFmY2MtNjY0Yi00N2FmLTk1MmUtNTIxYTE0ZDJjM2QwIiwic3ViIjoic3lzdGVtOnNlcnZpY2VhY2NvdW50Omt1YmUtc3lzdGVtOmdpdGxhYi1hZG1pbiJ9.RXFvKk46hcB7m0OPLcROf-fQYJxBQ33UmSZRdiKaf8ulA73RZ35VShz1KY3YLYRctBeY1dZDjmGiguGpP9cvfGbAj_uy65vFDo02BtjOqIo-ueJ1T6k-ktT6E8O7BnmnGrD-QWqxG48FWLNkgj6ySlqWGoIX5Km7iqdslK18PNsFFzJSAYvai3-ZuDtbI9zhSANJxM-GMuwQY9X6uzso6dQ6aBwwEMzJvURy_Y6ibaukabThrkPusZKkN4b-67udvGg38jW7wwQuyLN8UrZrOSm1jrxWK3p5AWOwaq7HWkHD00oN3aWpTJkXpBBkKJTom4pf5JEHNPwpZijqlvxNQA% 
+jq -r '.items[] | select(.metadata.name | startswith("gitlab-admin")) | .data.token' | base64 --decode > token.txt
+
+helm install --namespace default gitlab-runner -f values.yaml gitlab/gitlab-runner
+kubectl get pods -n default | grep gitlab-runner
+
+yc managed-kubernetes cluster get k8s-otus --format=json \
+| jq -r .master.master_auth.cluster_ca_certificate
+-----BEGIN CERTIFICATE-----
+MIIC5zCCAc+gAwIBAgIBADANBgkqhkiG9w0BAQsFADAVMRMwEQYDVQQDEwprdWJl
+cm5ldGVzMB4XDTIyMDUxODA3MzM1NFoXDTMyMDUxNTA3MzM1NFowFTETMBEGA1UE
+AxMKa3ViZXJuZXRlczCCASIwDQYJKoZIhvcNAQEBBQADggEPADCCAQoCggEBAM6u
+yCYe90aKs3ZCMHO9A0qt/fGbCN2HU16xr0WH2wBAFwsg1dOCT0ZEs1OmLnBWbBuh
+i5qqzXl+scf+yGG36b3hPmrwwp2p8e8850IIeh2MWQ6otd1BR4fgUu8kkqrIc6+J
+a8a/RieuP0VFJJvpIrwFSzwqSvIJCoG1PUE6OXX+ci1piefsyE63+4Jhp5Q94gG6
+068PMkOf3QPt4irgNaS4Z3GBwo0S6QBCX2CSDeo9jBtd2Kh0khryIliGiwhG1YjQ
+7iulsKiMacRpuW86rq0mn5yaw1ci8MN0qTpQmXYfiZUV6zUV39AvyMS+CINpUhbK
+gvnvYhjVuTbIfmRUJmECAwEAAaNCMEAwDgYDVR0PAQH/BAQDAgKkMA8GA1UdEwEB
+/wQFMAMBAf8wHQYDVR0OBBYEFCBRARo08mR4HLxLXCWH8WaHhXnCMA0GCSqGSIb3
+DQEBCwUAA4IBAQClmGzB0Q92MGmymz7k4d3trDWWtvjsHw1oEZGvy479fOqqTz51
+RrYXSwTop6kti41fjLLqI6xC1exn6zkeP4/X3GMwf0dE88NSAlJDV3hjTxte3SY2
+Pm9poc+c9+FsPSq5FdVf0jHHg/A9o8M9q5AhXm0TvmoVOay4O1+6p4emiugB0Vgr
+e4Lqb0hnRjQyUwH6+PAKqHdaMXe5w1HaeHBYtWiobxM4VJx5sl2DmcEvs0FHirKC
+g4ZEw+0DMR7rmRdE9bMict9UK9BDvwS2ctKO9juJEHEMkhNSrASfr5kLRgO/h4jo
+fF3B0Ik4uBX7DkzOTM1r+fxu/atEc2DvppQz
+-----END CERTIFICATE-----
+
+
 #Создайте GitLab Runner
 helm repo add gitlab https://charts.gitlab.io
 helm install --namespace default gitlab-runner -f values.yaml gitlab/gitlab-runner

@@ -35,10 +35,10 @@ metadata:
 spec:
   tls:
     - hosts:
-      - 51.250.14.63.nip.io
+      - 51.250.87.69.nip.io
       secretName: letsencrypt
   rules:
-    - host: 51.250.14.63.nip.io
+    - host: 51.250.87.69.nip.io
       http:
         paths:
         - path: /
