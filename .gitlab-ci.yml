@@ -2,8 +2,8 @@ stages:
   - build
   - deploy
 
-variables:
-  USER_NAME='deron73'
+# variables:
+#   USER_NAME='deron73'
 
 build:
   stage: build
