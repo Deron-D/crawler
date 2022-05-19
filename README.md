@@ -166,7 +166,8 @@ MIIC5zCCAc+gAwIBAgIBADANBgkqhkiG9w0BAQsFADAVMRMwEQYDVQQDEwprdWJl
 #### Проверяем
 ~~~bash
 git remote add gitlab git@51.250.92.22:search_engine/crawler.git
-git commit -m 'GitLab pipeline test'
-git tag Test
-git push gitlab --tags
+git commit -am 'GitLab pipeline test'
+git push gitlab
 ~~~
+
+![png/pipeline.png](png/pipeline.png)
