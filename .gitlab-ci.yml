@@ -1,9 +1,12 @@
 stages:
   - build
+  - test
   - deploy
 
 variables:
   USER_NAME: 'deron73'
+  DIND: 'docker:19.03.1-dind'
+  REGISTRY_ID: 'crpgcgk4jpof2ibnqn7j'
 
 build:
   stage: build
@@ -13,14 +16,29 @@ build:
     DOCKER_HOST: tcp://localhost:2375/
   image: cr.yandex/yc/metadata-token-docker-helper:0.2
   services:
-    - docker:19.03.1-dind
+    - $DIND
   script:
     - cd ./src/search_engine_crawler
-    - docker build . -t cr.yandex/crpgcgk4jpof2ibnqn7j/crawler-engine:gitlab-$CI_COMMIT_SHORT_SHA
-    - docker push cr.yandex/crpgcgk4jpof2ibnqn7j/crawler-engine:gitlab-$CI_COMMIT_SHORT_SHA
+    - docker build . -t cr.yandex/$REGISTRY_ID/crawler-engine:gitlab-$CI_COMMIT_SHORT_SHA
+    - docker push cr.yandex/$REGISTRY_ID/crawler-engine:gitlab-$CI_COMMIT_SHORT_SHA
     - cd ../search_engine_ui
-    - docker build . -t cr.yandex/crpgcgk4jpof2ibnqn7j/crawler-ui:gitlab-$CI_COMMIT_SHORT_SHA
-    - docker push cr.yandex/crpgcgk4jpof2ibnqn7j/crawler-ui:gitlab-$CI_COMMIT_SHORT_SHA
+    - docker build . -t cr.yandex/$REGISTRY_ID/crawler-ui:gitlab-$CI_COMMIT_SHORT_SHA
+    - docker push cr.yandex/$REGISTRY_ID/crawler-ui:gitlab-$CI_COMMIT_SHORT_SHA
+
+test:
+  test_crawler:
+    stage: test
+    services:
+      - $DIND
+    script:
+      - docker run --rm cr.yandex/$REGISTRY_ID/crawler-engine:gitlab-$CI_COMMIT_SHORT_SHA python3 -m unittest discover -s tests/
+
+  test_ui:
+    stage: test
+    services:
+      - $DIND
+    script:
+      - docker run --rm cr.yandex/$REGISTRY_ID/crawler-ui:gitlab-$CI_COMMIT_SHORT_SHA python3 -m unittest discover -s tests/
 
 deploy:
   image: ruby:2.4.2
@@ -35,6 +53,6 @@ deploy:
     - kubectl config use-context default
     - ls -lr
     - cd ./k8s/crawler/
-    - sed -i "s/deron73\x2Fcrawler-engine:1.0/cr.yandex\x2Fcrpgcgk4jpof2ibnqn7j\x2Fcrawler-engine:gitlab-$CI_COMMIT_SHORT_SHA/" crawler-deployment.yml
-    - sed -i "s/deron73\x2Fcrawler-ui:1.0/cr.yandex\x2Fcrpgcgk4jpof2ibnqn7j\x2Fcrawler-ui:gitlab-$CI_COMMIT_SHORT_SHA/" ui-deployment.yml
+    - sed -i "s/deron73\x2Fcrawler-engine:1.0/cr.yandex\x2F$REGISTRY_ID\x2Fcrawler-engine:gitlab-$CI_COMMIT_SHORT_SHA/" crawler-deployment.yml
+    - sed -i "s/deron73\x2Fcrawler-ui:1.0/cr.yandex\x2F$REGISTRY_ID\x2Fcrawler-ui:gitlab-$CI_COMMIT_SHORT_SHA/" ui-deployment.yml
     - kubectl apply -f .

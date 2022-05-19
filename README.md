@@ -189,5 +189,6 @@ helm install prometheus prometheus-community/kube-prometheus-stack -f values.yml
 #### Проверяем
 - [https://prometheus.51.250.87.69.nip.io/targets](https://prometheus.51.250.87.69.nip.io/targets)
 - [https://grafana.51.250.87.69.nip.io/](https://grafana.51.250.87.69.nip.io/)
+- [https://alertmanager.51.250.87.69.nip.io/#/status](https://alertmanager.51.250.87.69.nip.io/#/status)
 
 ![png/grafana.png](png/grafana.png)
