@@ -89,7 +89,18 @@ defaultRules:
 
 ## Provide custom recording or alerting rules to be deployed into the cluster.
 ##
-additionalPrometheusRulesMap: {}
+additionalPrometheusRulesMap:
+  - groups:
+     - name: alert.rules
+       rules:
+         - alert: InstanceDown
+           expr: up == 0
+           for: 1m
+           labels:
+             severity: warning
+           annotations:
+             description: '{{ $labels.instance }} of job {{ $labels.job }} has been down for more than 1 minute'
+             summary: 'Instance {{ $labels.instance }} down'
 #  rule-name:
 #    groups:
 #    - name: my_group
@@ -181,46 +192,30 @@ alertmanager:
   config:
     global:
       resolve_timeout: 5m
-      slack_api_url: 'https://hooks.slack.com/services/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'
+      slack_api_url: 'https://hooks.slack.com/services/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'
     route:
-      group_by: ['alertname', 'cluster', 'service']
+      group_by: ['job']
       group_wait: 30s
       group_interval: 5m
-      repeat_interval: 1h
-      receiver: 'default-receiver'
+      repeat_interval: 12h
+      receiver: 'null'
       routes:
       - match:
-          alertname: DeadMansSwitch
+          severity: page
         receiver: 'null'
-    inhibit_rules:
-    - source_match:
-        severity: 'critical'
-      target_match:
-        severity: 'warning'
-      equal: ['alertname', 'cluster', 'service']
+      - receiver: 'slack-notifications'
+        continue: true
     receivers:
-    - name: 'default-receiver'
-      slack_configs:
-      - channel: '#alerts' # Ваш канал Slack для оповещений
-        username: 'AlertManager'  # Имя, отображаемое в оповещении
-        color: '{{ if eq .Status "firing" }}danger{{ else }}good{{ end }}'
-        title: '[{{ .Status | toUpper }}{{ if eq .Status "firing" }}:{{ .Alerts.Firing | len }}{{ end }}] Prometheus Event Notification'
-        title_link: '{{ template "slack.default.titlelink" . }}'
-        pretext: '{{ .CommonAnnotations.summary }}'
-        text: |-
-          {{ range .Alerts }}
-            {{- if .Annotations.summary }}*Alert:* {{ .Annotations.summary }} - `{{ .Labels.severity }}`{{- end }}
-            *Description:* {{ .Annotations.description }}{{ .Annotations.message }}
-            *Graph:* <{{ .GeneratorURL }}|:chart_with_upwards_trend:>{{ if or .Annotations.runbook .Annotations.runbook_url }} *Runbook:* <{{ .Annotations.runbook }}{{ .Annotations.runbook_url }}|:spiral_note_pad:>{{ end }}
-            *Details:*
-            {{ range .Labels.SortedPairs }} • *{{ .Name }}:* `{{ .Value }}`
-            {{ end }}
-          {{ end }}
-        fallback: '{{ template "slack.default.fallback" . }}'
-        icon_emoji: '{{ template "slack.default.iconemoji" . }}'
-        icon_url: '{{ template "slack.default.iconurl" . }}'
-        send_resolved: true
     - name: 'null'
+    - name: 'slack-notifications'
+      slack_configs:
+      - channel: '#dppcrawler'
+        title: '[{{ .Status | toUpper }}{{ if eq .Status "firing" }}:{{ .Alerts.Firing | len }}{{ end }}] Test Alertmanager'
+        text: >-
+          {{ range .Alerts }}
+            *Alert:* {{ .Annotations.summary }} - `{{ .Labels.severity }}`
+          {{ end }}
+        send_resolved: true
   ## Pass the Alertmanager configuration directives through Helm's templating
   ## engine. If the Alertmanager configuration contains Alertmanager templates,
   ## they'll need to be properly escaped so that they are not interpreted by
