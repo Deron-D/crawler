@@ -163,4 +163,10 @@ MIIC5zCCAc+gAwIBAgIBADANBgkqhkiG9w0BAQsFADAVMRMwEQYDVQQDEwprdWJl
 #### Подключим k8s для развертывания в нём проекта `search_engine/crawler` к раннеру GitLab [http://51.250.92.22/search_engine/crawler/-/clusters/2?tab=details](http://51.250.92.22/search_engine/crawler/-/clusters/2?tab=details)
 ![png/k8s-gitlab-connect.png](png/k8s-gitlab-connect.png)
 
-
+#### Проверяем
+~~~bash
+git remote add gitlab git@51.250.92.22:search_engine/crawler.git
+git commit -m 'GitLab pipeline test'
+git tag Test
+git push gitlab --tags
+~~~
