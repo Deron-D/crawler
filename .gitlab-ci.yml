@@ -37,13 +37,17 @@ test_crawler:
   script:
     - docker run --rm cr.yandex/$REGISTRY_ID/crawler-engine:gitlab-$CI_COMMIT_SHORT_SHA python3 -m unittest discover -s tests/
 
-# test_ui:
-#   stage: test
-#   image: docker:latest
-#   services:
-#     - $DIND
-#   script:
-#     - docker run --rm cr.yandex/$REGISTRY_ID/crawler-ui:gitlab-$CI_COMMIT_SHORT_SHA python3 -m unittest discover -s tests/
+test_ui:
+  stage: test
+  variables:
+    DOCKER_DRIVER: overlay2
+    DOCKER_TLS_CERTDIR: ""
+    DOCKER_HOST: tcp://localhost:2375/
+  image: cr.yandex/yc/metadata-token-docker-helper:0.2
+  services:
+    - $DIND
+  script:
+    - docker run --rm cr.yandex/$REGISTRY_ID/crawler-ui:gitlab-$CI_COMMIT_SHORT_SHA python3 -m unittest discover -s tests/
 
 deploy:
   image: ruby:2.4.2
