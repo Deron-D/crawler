@@ -192,3 +192,4 @@ helm install prometheus prometheus-community/kube-prometheus-stack -f values.yml
 - [https://alertmanager.51.250.87.69.nip.io/#/status](https://alertmanager.51.250.87.69.nip.io/#/status)
 
 ![png/grafana.png](png/grafana.png)
+
