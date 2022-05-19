@@ -25,21 +25,21 @@ build:
     - docker build . -t cr.yandex/$REGISTRY_ID/crawler-ui:gitlab-$CI_COMMIT_SHORT_SHA
     - docker push cr.yandex/$REGISTRY_ID/crawler-ui:gitlab-$CI_COMMIT_SHORT_SHA
 
-test_crawler:
-  stage: test
-  image: docker:latest
-  services:
-    - $DIND
-  script:
-    - docker run --rm cr.yandex/$REGISTRY_ID/crawler-engine:gitlab-$CI_COMMIT_SHORT_SHA python3 -m unittest discover -s tests/
+# test_crawler:
+#   stage: test
+#   image: docker:latest
+#   services:
+#     - $DIND
+#   script:
+#     - docker run --rm cr.yandex/$REGISTRY_ID/crawler-engine:gitlab-$CI_COMMIT_SHORT_SHA python3 -m unittest discover -s tests/
 
-test_ui:
-  stage: test
-  image: docker:latest
-  services:
-    - $DIND
-  script:
-    - docker run --rm cr.yandex/$REGISTRY_ID/crawler-ui:gitlab-$CI_COMMIT_SHORT_SHA python3 -m unittest discover -s tests/
+# test_ui:
+#   stage: test
+#   image: docker:latest
+#   services:
+#     - $DIND
+#   script:
+#     - docker run --rm cr.yandex/$REGISTRY_ID/crawler-ui:gitlab-$CI_COMMIT_SHORT_SHA python3 -m unittest discover -s tests/
 
 deploy:
   image: ruby:2.4.2
