@@ -29,13 +29,13 @@
 
 ## Выполнено:
 
-1. Создан makefile для сборки образов
+## 1. Создан makefile для сборки образов
 ~~~bash
 cd ./docker
 make
 ~~~
 
-2. Создан docker-compose.yml для сборки приложения
+## 2. Создан docker-compose.yml для сборки приложения
 ~~~bash
 ➜  docker git:(main) docker-compose up -d
 ➜  docker git:(main) curl http://localhost:8000
@@ -49,13 +49,12 @@ make
   ...
   ~~~
 
-3. Деплой приложения в k8s
+## 3. Деплой приложения в k8s
 ~~~bash
 cd ./crawler/terraform-k8s/  
 terraform init
 terraform apply --auto-approve
 helm install ingress-nginx ingress-nginx/ingress-nginx
-
 helm repo add jetstack https://charts.jetstack.io
 helm repo update
 helm install \
@@ -66,43 +65,102 @@ helm install \
   --version v1.8.0 \
   --set prometheus.enabled=false \
   --set webhook.timeoutSeconds=4
-
-kubectl apply -f ../k8s/crawler/namespaces.yml
-kubectl apply -f ../k8s/crawler/ -n dev
 kubectl --namespace default get services -o wide -w ingress-nginx-controller
+~~~
 
-#GitLab CI
-cd k8s/gitlab-ci
+### Вносим адреса сервисов в 'crawler/k8s/crawler/ui-ingress.yml'
+~~~yaml
+spec:
+  tls:
+    - hosts:
+      - 51.250.87.69.nip.io
+      - grafana.51.250.87.69.nip.io
+      - prometheus.51.250.87.69.nip.io
+      secretName: letsencrypt
+  rules:
+    - host: 51.250.87.69.nip.io
+ ...
+    - host: grafana.51.250.87.69.nip.io
+ ...
+    - host: prometheus.51.250.87.69.nip.io
+ ...
+ ~~~
+
+
+### Деплоим приклад
+~~~bash
+kubectl apply -f ../k8s/crawler/
+~~~
+
+### Проверяем [https://51.250.87.69.nip.io/?query=blog](https://51.250.87.69.nip.io/?query=blog)
+![png/search.png](png/search.png)
+
+
+## 4. Настройка CI/CD [https://cloud.yandex.com/en-ru/docs/tutorials/infrastructure-management/gitlab-containers](https://cloud.yandex.com/en-ru/docs/tutorials/infrastructure-management/gitlab-containers)
+
+### Поднимаем GitLab
+~~~bash
+cd crawler/gitlab-ci/terraform
+terraform apply --auto-approve
+~~~
+
+### Вспоминаем пароль по умолчанию
+~~~bash
+crawler/gitlab-ci/ansible
+➜  ansible git:(main) ✗ ansible-playbook playbook.yml
+...
+TASK [config-gitlab-ci : debug] **************************************************************************************************************************************************************************************************************************************************
+ok: [gitlab-ci-vm-0] => {
+    "msg": "content of remote file /etc/gitlab/initial_root_password: z7M17GY5B4l259DH0HINubh8tVnzNRotf4E3jJ6nAC8="
+}
+...
+~~~
+
+### Проверяем UI GitLab [http://51.250.92.22/users/sign_in](http://51.250.92.22/users/sign_in)
+![png/gitlab-projects.png](png/gitlab-projects.png)
+
+
+### Создадим реестр Container Registry от Yandex Cloud
+![png/registry.png](png/registry.png)
+
+
+### Внесем endpoint инстанса GitLab и токен из [http://51.250.92.22/search_engine/crawler/-/settings/ci_cd](http://51.250.92.22/search_engine/crawler/-/settings/ci_cd) в `crawler/k8s/monitoring/values.yml`
+~~~yml
+gitlabUrl: http://51.250.92.22/
+runnerRegistrationToken: "token"
+~~~
+
+### Создадим GitLab Runner в k8s
+~~~bash
+helm repo add gitlab https://charts.gitlab.io
+helm install --namespace default gitlab-runner -f values.yaml gitlab/gitlab-runner
+# Проверим успешный запуск раннера
+kubectl get pods -n default | grep gitlab-runner
+~~~
+
+### Настроим сборку и развертывание в k8s из GitLab
+
+#### Получим токен сервисного аккаунта Kubernetes для аутентификации в GitLab 
+~~~bash
+cd crawler/k8s/gitlab-ci
 kubectl apply -f gitlab-admin-service-account.yaml
 kubectl -n kube-system get secrets -o json | jq -r '.items[] | select(.metadata.name | startswith("gitlab-admin")) | .data.token' | base64 --decode > token.txt
+~~~
 
-helm install --namespace default gitlab-runner -f values.yaml gitlab/gitlab-runner
-kubectl get pods -n default | grep gitlab-runner
-
+#### Уточним CA сертификат кластера
+~~~bash
 yc managed-kubernetes cluster get k8s-otus --format=json | jq -r .master.master_auth.cluster_ca_certificate
 -----BEGIN CERTIFICATE-----
 MIIC5zCCAc+gAwIBAgIBADANBgkqhkiG9w0BAQsFADAVMRMwEQYDVQQDEwprdWJl
-cm5ldGVzMB4XDTIyMDUxODA3MzM1NFoXDTMyMDUxNTA3MzM1NFowFTETMBEGA1UE
-AxMKa3ViZXJuZXRlczCCASIwDQYJKoZIhvcNAQEBBQADggEPADCCAQoCggEBAM6u
-yCYe90aKs3ZCMHO9A0qt/fGbCN2HU16xr0WH2wBAFwsg1dOCT0ZEs1OmLnBWbBuh
-i5qqzXl+scf+yGG36b3hPmrwwp2p8e8850IIeh2MWQ6otd1BR4fgUu8kkqrIc6+J
-a8a/RieuP0VFJJvpIrwFSzwqSvIJCoG1PUE6OXX+ci1piefsyE63+4Jhp5Q94gG6
-068PMkOf3QPt4irgNaS4Z3GBwo0S6QBCX2CSDeo9jBtd2Kh0khryIliGiwhG1YjQ
-7iulsKiMacRpuW86rq0mn5yaw1ci8MN0qTpQmXYfiZUV6zUV39AvyMS+CINpUhbK
-gvnvYhjVuTbIfmRUJmECAwEAAaNCMEAwDgYDVR0PAQH/BAQDAgKkMA8GA1UdEwEB
-/wQFMAMBAf8wHQYDVR0OBBYEFCBRARo08mR4HLxLXCWH8WaHhXnCMA0GCSqGSIb3
-DQEBCwUAA4IBAQClmGzB0Q92MGmymz7k4d3trDWWtvjsHw1oEZGvy479fOqqTz51
-RrYXSwTop6kti41fjLLqI6xC1exn6zkeP4/X3GMwf0dE88NSAlJDV3hjTxte3SY2
-Pm9poc+c9+FsPSq5FdVf0jHHg/A9o8M9q5AhXm0TvmoVOay4O1+6p4emiugB0Vgr
-e4Lqb0hnRjQyUwH6+PAKqHdaMXe5w1HaeHBYtWiobxM4VJx5sl2DmcEvs0FHirKC
-g4ZEw+0DMR7rmRdE9bMict9UK9BDvwS2ctKO9juJEHEMkhNSrASfr5kLRgO/h4jo
-fF3B0Ik4uBX7DkzOTM1r+fxu/atEc2DvppQz
+...
 -----END CERTIFICATE-----
-
-
-#Создайте GitLab Runner
-helm repo add gitlab https://charts.gitlab.io
-helm install --namespace default gitlab-runner -f values.yaml gitlab/gitlab-runner
-
-kubectl --namespace default get services -o wide -w ingress-nginx-controller
 ~~~
+
+#### Создадим переменные окружения GitLab [http://51.250.92.22/search_engine/crawler/-/settings/ci_cd](http://51.250.92.22/search_engine/crawler/-/settings/ci_cd)
+![png/k8s-gitlab-vars.png](png/k8s-gitlab-vars.png)
+
+
+#### Подключим k8s для развертывания в нём проекта `search_engine/crawler` к раннеру GitLab [http://51.250.92.22/search_engine/crawler/-/clusters/2?tab=details](http://51.250.92.22/search_engine/crawler/-/clusters/2?tab=details)
+![png/k8s-gitlab-connect.png](png/k8s-gitlab-connect.png)
+
+

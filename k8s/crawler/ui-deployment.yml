@@ -26,6 +26,7 @@ spec: # Блок спецификации деплоя
     spec:
       containers:
       - image: deron73/crawler-ui:1.0
+        imagePullPolicy: Always
         name: ui
         ports:
           - containerPort: 8000

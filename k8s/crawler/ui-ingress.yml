@@ -44,9 +44,3 @@ spec:
               name: prometheus-operated
               port:
                 number: 9090
-
-
-
-
-
-

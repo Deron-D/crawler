@@ -24,6 +24,7 @@ spec:
     spec:
       containers:
       - image: deron73/crawler-engine:1.0
+        imagePullPolicy: Always
         name: crawler
         env:
         - name: MONGO
