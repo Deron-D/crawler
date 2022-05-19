@@ -176,7 +176,7 @@ git push gitlab
 [https://app.slack.com/client/T6HR0TUP3/C037903MQUC](https://app.slack.com/client/T6HR0TUP3/C037903MQUC)
 ![png/chatops.png](png/chatops.png)
 
-## 5. Мониторинг
+## 6. Мониторинг
 
 #### Установка 
 ~~~bash
