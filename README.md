@@ -5,7 +5,7 @@
 - Автоматизированные процессы создания и управления платформой
   - Ресурсы Ya.cloud
   - Инфраструктура для CI/CD
-  -Инфраструктура для сбора обратной связи
+  - Инфраструктура для сбора обратной связи
 - Использование практики IaC (Infrastructure as Code) для управления конфигурацией и инфраструктурой
 - Настроен процесс CI/CD
 - Все, что имеет отношение к проекту хранится в Git
@@ -124,7 +124,7 @@ ok: [gitlab-ci-vm-0] => {
 ![png/registry.png](png/registry.png)
 
 
-### Внесем endpoint инстанса GitLab и токен из [http://51.250.92.22/search_engine/crawler/-/settings/ci_cd](http://51.250.92.22/search_engine/crawler/-/settings/ci_cd) в `crawler/k8s/monitoring/values.yml`
+### Внесем endpoint инстанса GitLab и токен из [http://51.250.92.22/search_engine/crawler/-/settings/ci_cd](http://51.250.92.22/search_engine/crawler/-/settings/ci_cd) в `crawler/k8s/gitlab-ci/values.yaml`
 ~~~yml
 gitlabUrl: http://51.250.92.22/
 runnerRegistrationToken: "token"
@@ -171,3 +171,23 @@ git push gitlab
 ~~~
 
 ![png/pipeline.png](png/pipeline.png)
+
+## 5. ChatOps
+[https://app.slack.com/client/T6HR0TUP3/C037903MQUC](https://app.slack.com/client/T6HR0TUP3/C037903MQUC)
+![png/chatops.png](png/chatops.png)
+
+## 5. Мониторинг
+
+#### Установка 
+~~~bash
+cd crawler/k8s/monitoring/
+helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
+helm repo update
+helm install prometheus prometheus-community/kube-prometheus-stack -f values.yml
+~~~
+
+#### Проверяем
+- [https://prometheus.51.250.87.69.nip.io/targets](https://prometheus.51.250.87.69.nip.io/targets)
+- [https://grafana.51.250.87.69.nip.io/](https://grafana.51.250.87.69.nip.io/)
+
+![png/grafana.png](png/grafana.png)
