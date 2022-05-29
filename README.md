@@ -54,7 +54,10 @@ make
 cd ./crawler/terraform-k8s/  
 terraform init
 terraform apply --auto-approve
+
+helm repo add ingress-nginx https://kubernetes.github.io/ingress-nginx
 helm install ingress-nginx ingress-nginx/ingress-nginx
+
 helm repo add jetstack https://charts.jetstack.io
 helm repo update
 helm install \
@@ -65,6 +68,7 @@ helm install \
   --version v1.8.0 \
   --set prometheus.enabled=false \
   --set webhook.timeoutSeconds=4
+
 kubectl --namespace default get services -o wide -w ingress-nginx-controller
 ~~~
 
@@ -73,16 +77,16 @@ kubectl --namespace default get services -o wide -w ingress-nginx-controller
 spec:
   tls:
     - hosts:
-      - 51.250.87.69.nip.io
-      - grafana.51.250.87.69.nip.io
-      - prometheus.51.250.87.69.nip.io
+      - 51.250.82.190.nip.io
+      - grafana.51.250.82.190.nip.io
+      - prometheus.51.250.82.190.nip.io
       secretName: letsencrypt
   rules:
-    - host: 51.250.87.69.nip.io
+    - host: 51.250.82.190.nip.io
  ...
-    - host: grafana.51.250.87.69.nip.io
+    - host: grafana.51.250.82.190.nip.io
  ...
-    - host: prometheus.51.250.87.69.nip.io
+    - host: prometheus.51.250.82.190.nip.io
  ...
  ~~~
 
@@ -92,7 +96,7 @@ spec:
 kubectl apply -f ../k8s/crawler/
 ~~~
 
-### Проверяем [https://51.250.87.69.nip.io/?query=blog](https://51.250.87.69.nip.io/?query=blog)
+### Проверяем [https://51.250.82.190.nip.io/?query=blog](https://51.250.82.190.nip.io/?query=blog)
 ![png/search.png](png/search.png)
 
 
@@ -187,9 +191,9 @@ helm install prometheus prometheus-community/kube-prometheus-stack -f values.yml
 ~~~
 
 #### Проверяем
-- [https://prometheus.51.250.87.69.nip.io/targets](https://prometheus.51.250.87.69.nip.io/targets)
-- [https://grafana.51.250.87.69.nip.io/](https://grafana.51.250.87.69.nip.io/)
-- [https://alertmanager.51.250.87.69.nip.io/#/status](https://alertmanager.51.250.87.69.nip.io/#/status)
+- [https://prometheus.51.250.82.190.nip.io/targets](https://prometheus.51.250.82.190.nip.io/targets)
+- [https://grafana.51.250.82.190.nip.io/](https://grafana.51.250.82.190.nip.io/)
+- [https://alertmanager.51.250.82.190.nip.io/#/status](https://alertmanager.51.250.82.190.nip.io/#/status)
 
 ![png/grafana.png](png/grafana.png)
 

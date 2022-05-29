@@ -9,13 +9,13 @@ metadata:
 spec:
   tls:
     - hosts:
-      - 51.250.87.69.nip.io
-      - grafana.51.250.87.69.nip.io
-      - prometheus.51.250.87.69.nip.io
-      - alertmanager.51.250.87.69.nip.io
+      - 51.250.82.190.nip.io
+      - grafana.51.250.82.190.nip.io
+      - prometheus.51.250.82.190.nip.io
+      - alertmanager.51.250.82.190.nip.io
       secretName: letsencrypt
   rules:
-    - host: 51.250.87.69.nip.io
+    - host: 51.250.82.190.nip.io
       http:
         paths:
         - path: /
@@ -25,7 +25,7 @@ spec:
               name: ui
               port:
                 number: 8000
-    - host: grafana.51.250.87.69.nip.io
+    - host: grafana.51.250.82.190.nip.io
       http:
         paths:
         - path: /
@@ -35,7 +35,7 @@ spec:
               name: prometheus-grafana
               port:
                 number: 80
-    - host: prometheus.51.250.87.69.nip.io
+    - host: prometheus.51.250.82.190.nip.io
       http:
         paths:
         - path: /
@@ -45,7 +45,7 @@ spec:
               name: prometheus-operated
               port:
                 number: 9090
-    - host: alertmanager.51.250.87.69.nip.io
+    - host: alertmanager.51.250.82.190.nip.io
       http:
         paths:
         - path: /
